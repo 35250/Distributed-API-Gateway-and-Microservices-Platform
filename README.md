@@ -1,6 +1,6 @@
 # Distributed-API-Gateway-and-Microservices-Platform
 
-                Client
+  Client
                    │
                    ▼
              API Gateway
