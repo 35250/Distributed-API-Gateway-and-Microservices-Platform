@@ -2,7 +2,7 @@ const express= require("express");
 const pool= require("./db.js");
 const crypto= require("crypto");
 const app= express();
-app.use(express.json);
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
     try{
@@ -22,7 +22,7 @@ app.post("/signup", async (req, res) => {
     );
 
     if(result.rows.length !== 0){
-        return res.status(409).send("This username already exists. Please send a unique username.");
+        return res.status(401).send("This username already exists. Please send a unique username.");
     }
 
     const insertResult= await pool.query(
@@ -38,6 +38,7 @@ app.post("/signup", async (req, res) => {
         success: "User created successfully.",
         user: insertResult.rows
     });
+    
     } catch (err) {
         console.error("POST /signup endpoint failed", err)
         return res.status(500).json({
@@ -126,7 +127,41 @@ app.delete("/logout", async (req, res) => {
     }
 });
 
+app.post("/validate", async (req, res) => {
+    try{
+        const {sessionId} = req.body;
 
-app.listen(3000, () => {
-    console.log(`Auth server is running on port 3000`);
+        if(typeof sessionId !== "string" || sessionId.trim().length === 0){
+            return res.status(400).send("Please provide a valid session id");
+        }
+
+        const result = await pool.query(
+            `
+            SELECT * 
+            FROM sessions
+            WHERE session_id = $1
+            AND expires_at > CURRENT_TIMESTAMP;
+            `,
+            [sessionId]
+        )
+
+        if(result.rows.length === 0){
+            return res.status(401).send("User not verified.");
+        }
+
+        return res.status(200).json({
+            success: "User successfully verified.",
+            user_Id: result.rows[0].user_id
+        });
+    
+    } catch (err) {
+        console.error("POST /validate endpoint failed", err);
+        return res.status(500).json({
+            error: "Something went wrong. Please try again later!"
+        });
+    }    
+});
+
+app.listen(3001, () => {
+    console.log(`Auth server is running on port 3001`);
 })
