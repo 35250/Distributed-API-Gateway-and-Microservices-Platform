@@ -25,3 +25,11 @@ DELETE /tasks/:id - Status: 200 OK Size: 12 Bytes Time: 158 ms
   - Median Latency: **66 ms**
   - 99th Percentile Latency: **86 ms**
 - These results serve as the **performance baseline** before introducing the API Gateway, Authentication Service, Redis Rate Limiting, and Load Balancer.
+
+
+# Auth Service
+POST /signup - Status: 201 Created Size: 77 Bytes Time: 162 ms
+POST /login - Status: 200 OK Size: 87 Bytes Time: 166 ms
+DELETE /logout - Status: 200 OK Size: 28 Bytes Time: 165 ms
+POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
+400 Bad request and 401 Not authorized is tested successfully. 
