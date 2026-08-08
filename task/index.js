@@ -1,35 +1,34 @@
 const express= require("express");
-const pool= require("./db")
+const pool= require("./db");
+const authenticate= require("./authenticate");
 const app= express();
-
 app.use(express.json());
 
 app.post("/tasks", async (req, res) => {
     try{
-        const title = req.body.title;
-        const description = req.body.description;
+        const {title, description, sessionId} = req.body;
+        const authResult = await authenticate(sessionId);
+        
+        if(!authResult.valid){
+            return res.status(401).send(authResult.message);
+        }
 
-        // Title must exist
         if (title === undefined) {
             return res.status(400).send("Title is required");
         }
 
-        // Title must be a string
         if (typeof title !== "string") {
             return res.status(400).send("Title must be a string");
         }
 
-        // Title must not be empty
         if (title.trim().length === 0) {
             return res.status(400).send("Title cannot be empty");
         }
 
-        // Title length check
         if (title.length > 100) {
             return res.status(400).send("Title must be within 100 characters");
         }
 
-        // Description is optional
         if (description !== undefined) {
 
             if (typeof description !== "string") {
@@ -63,6 +62,13 @@ app.post("/tasks", async (req, res) => {
 app.get("/tasks/:id", async (req, res) =>{
     try{
         const id= Number(req.params.id);
+        const {sessionId} = req.body;
+
+        const authResult = await authenticate(sessionId);
+
+        if(!authResult.valid){
+            return res.status(401).send(authResult.message);
+        }
 
         if(!Number.isInteger(id) || id <= 0){
             return res.status(400).send("Please send a valid Task ID");
@@ -94,6 +100,13 @@ app.get("/tasks/:id", async (req, res) =>{
 app.delete("/tasks/:id", async (req, res) => {
     try{
         const id= Number(req.params.id);
+        const {sessionId} = req.body;
+
+        const authResult = await authenticate(sessionId);
+
+        if(!authResult.valid){
+            return res.status(401).send(authResult.message);
+        }
 
         if(!Number.isInteger(id) || id <= 0){
             return res.status(400).send("Please send a valid Task ID");
