@@ -34,7 +34,7 @@ DELETE /logout - Status: 200 OK Size: 28 Bytes Time: 165 ms
 POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
 400 Bad request and 401 Not authorized is tested successfully. 
 
-## ApacheBench Benchmark Results (Baseline - Task Service)
+## ApacheBench Benchmark Results (Baseline - Task Service along with Auth Service)
 
 | Requests | Concurrency | Throughput (req/s) ↑ | Median Latency (ms) ↓ | 99th Percentile (ms) ↓ | Max Latency (ms) | Failed Requests |
 |----------|-------------|----------------------|------------------------|-------------------------|------------------|-----------------|
