@@ -33,3 +33,27 @@ POST /login - Status: 200 OK Size: 87 Bytes Time: 166 ms
 DELETE /logout - Status: 200 OK Size: 28 Bytes Time: 165 ms
 POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
 400 Bad request and 401 Not authorized is tested successfully. 
+
+## ApacheBench Benchmark Results (Baseline - Task Service)
+
+| Requests | Concurrency | Throughput (req/s) ↑ | Median Latency (ms) ↓ | 99th Percentile (ms) ↓ | Max Latency (ms) | Failed Requests |
+|----------|-------------|----------------------|------------------------|-------------------------|------------------|-----------------|
+| 100      | 10          | 1104.87              | 8                      | 16                      | 16               | 0               |
+| 1000     | 50          | 1645.35              | 30                     | 51                      | 52               | 0               |
+| 5000     | 100         | **2281.72**           | 42                     | **59**                  | 69               | 0               |
+| 10000    | 200         | **2476.29**           | 79                     | 95                      | 99               | 0               |
+| 10000    | 500         | 2455.01              | 84                     | 1158                    | 3170             | 0               |
+| 10000    | 1000        | **2489.29**           | 83                     | 2235                    | 3185             | 0               |
+
+## Key Observations
+
+- Successfully completed all benchmark runs with **0 failed requests** at the connection level.
+- Throughput increased rapidly with concurrency and began to **plateau around ~2,500 requests/sec**.
+- Beyond **200 concurrent requests**, throughput showed very little improvement while latency increased significantly.
+- At **500 concurrent requests**, 99th-percentile latency increased to **1.158 seconds**.
+- At **1000 concurrent requests**, 99th-percentile latency increased to **2.235 seconds**, with a maximum latency of **3.185 seconds**.
+- The **5000 requests / 100 concurrent users** benchmark provided a good balance between throughput and latency:
+  - Throughput: **2281.72 requests/sec**
+  - Median latency: **42 ms**
+  - 99th-percentile latency: **59 ms**
+- These results represent the **V0 baseline before introducing the Gateway, Redis rate limiter, and load balancer**.
