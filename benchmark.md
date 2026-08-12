@@ -59,7 +59,7 @@ POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
 - At **1000 concurrent requests**, throughput decreased to **821.85 req/s** while median latency increased sharply to **1162 ms** and the 99th percentile reached **3215 ms**.
 - This indicates that the Task Service approaches its saturation region around **200–500 concurrent requests**, where additional concurrency provides diminishing throughput gains but significantly increases latency.
 
-## ApacheBench benchmark Result (Baseline 3 - Gateway Redis rate limiter + Task + Auth)
+## ApacheBench Benchmark Results (Baseline 3 - Gateway Redis rate limiter + Task + Auth)
 
 Rate limit: 100 requests/IP per 60 seconds  
 Endpoint: GET /tasks/1  
