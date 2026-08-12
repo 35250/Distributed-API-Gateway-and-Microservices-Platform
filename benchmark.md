@@ -4,7 +4,7 @@ GET /tasks/:id - Status: 200 OK Size: 87 Bytes Time: 159 ms
 DELETE /tasks/:id - Status: 200 OK Size: 12 Bytes Time: 158 ms
 400 Bad request and 404 Not found is tested successfully. 
 
-## ApacheBench Benchmark Results (Baseline 0 - Task Service)
+## ApacheBench Benchmark Results (Baseline 1 - Task Service)
 
 | Requests | Concurrency | Throughput (req/s) ↑ | Median Latency (ms) ↓ | 99th Percentile (ms) ↓ | Max Latency (ms) | Failed Requests |
 |---------:|------------:|---------------------:|----------------------:|-----------------------:|-----------------:|----------------:|
@@ -34,7 +34,7 @@ DELETE /logout - Status: 200 OK Size: 28 Bytes Time: 165 ms
 POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
 400 Bad request and 401 Not authorized is tested successfully. 
 
-## ApacheBench Benchmark Results (Baseline 1 - Task Service along with Auth Service)
+## ApacheBench Benchmark Results (Baseline 2 - Task Service along with Auth Service)
 
 | Requests | Concurrency | Throughput (req/s) ↑ | Median Latency (ms) ↓ | 99th Percentile (ms) ↓ | Max Latency (ms) ↓ | Failed Requests |
 |----------|-------------|----------------------|-----------------------|-------------------------|---------------------|-----------------|
@@ -58,3 +58,27 @@ POST /validate - Status: 200 OK Size: 53 Bytes Time: 167 ms
 - Increasing concurrency from **200 → 500** produced only a small throughput improvement (**831.49 → 853.18 req/s**) while median latency increased substantially (**237 → 574 ms**).
 - At **1000 concurrent requests**, throughput decreased to **821.85 req/s** while median latency increased sharply to **1162 ms** and the 99th percentile reached **3215 ms**.
 - This indicates that the Task Service approaches its saturation region around **200–500 concurrent requests**, where additional concurrency provides diminishing throughput gains but significantly increases latency.
+
+## ApacheBench benchmark Result (Baseline 3 - Gateway Redis rate limiter + Task + Auth)
+
+Rate limit: 100 requests/IP per 60 seconds  
+Endpoint: GET /tasks/1  
+Gateway: 172.27.144.1:3002  
+Architecture: Gateway → Task Service → Auth Service → PostgreSQL
+
+| Total Requests | Concurrency | Accepted (2xx) | Rejected (429) | Requests/sec | Mean Latency | P99 Latency |
+|----------------|-------------|----------------|----------------|--------------|--------------|-------------|
+| 100            | 10          | 100            | 0              | 36.43        | 274.51 ms    | 2074 ms     |
+| 1,000          | 50          | 100            | 900            | 406.85       | 122.89 ms    | 1214 ms     |
+| 5,000          | 100         | 100            | 4,900          | 1709.20      | 58.51 ms     | 388 ms      |
+| 10,000         | 200         | 100            | 9,900          | 1905.36      | 104.97 ms    | 213 ms      |
+| 10,000         | 500         | 100            | 9,900          | 2146.92      | 232.89 ms    | 1168 ms     |
+| 10,000         | 1,000       | 100            | 9,900          | 2246.39      | 445.16 ms    | 3179 ms     |
+
+### Key Observation
+
+- The Redis-backed Gateway consistently enforced the **100 requests/IP/60s** rate limit under increasing load.
+- In the **5,000 requests / 100 concurrent** test:
+  - **4,900 requests were intentionally rejected with HTTP 429 by the Gateway**
+  - **100 requests were allowed to reach the downstream Task → Auth services**,
+- This reducing unnecessary downstream processing and demonstrating the Gateway's role as the system's first-line traffic control layer.
