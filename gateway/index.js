@@ -27,7 +27,7 @@ app.post("/tasks", async (req, res) => {
         const {title, description} = req.body;
         const sessionId = req.headers.authorization;
 
-        const response = await fetch("http://localhost:3000/tasks", {
+        const response = await fetch(`${process.env.TASK_SERVICE_URL}/tasks`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -62,7 +62,7 @@ app.get("/tasks/:id", async (req, res) => {
         const id = Number(req.params.id);
         const sessionId = req.headers.authorization;
 
-        const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        const response = await fetch(`${process.env.TASK_SERVICE_URL}/tasks/${id}`, {
             method: "GET",
             headers: {
                 "Authorization": sessionId 
@@ -92,7 +92,7 @@ app.delete("/tasks/:id", async (req, res) => {
         const id = Number(req.params.id);
         const sessionId = req.headers.authorization;
 
-        const response = await fetch(`http://localhost:3000/tasks/${id}`, {
+        const response = await fetch(`${process.env.TASK_SERVICE_URL}/tasks/${id}`, {
             method: "DELETE",
             headers: {
                 "Authorization": sessionId
