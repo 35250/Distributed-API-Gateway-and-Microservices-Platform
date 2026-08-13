@@ -7,7 +7,7 @@ const authenticate = async (sessionId) => {
             };
         }
 
-        const response = await fetch("http://localhost:3001/validate", {
+        const response = await fetch(`${process.env.AUTH_SERVICE_URL}/validate`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
