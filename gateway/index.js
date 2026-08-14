@@ -16,6 +16,36 @@ async function startServer() {
     }
 }
 
+app.get("/", (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Distributed API Gateway and Microservices Platform</title>
+        </head>
+
+        <body>
+            <h1>Distributed API Gateway and Microservices Platform</h1>
+
+            <h2>Services Offered</h2>
+            <ul>
+                <li>Redis Rate Limiter</li>
+                <li>User Authentication</li>
+            </ul>
+
+            <h2>Endpoints Deployed</h2>
+            <ul>
+                <li>POST /tasks</li>
+                <li>GET /tasks/:id</li>
+                <li>DELETE /tasks/:id</li>
+            </ul>
+        </body>
+        </html>
+    `);
+});
+
 app.post("/tasks", async (req, res) => {
     try {
         const rateLimitResult= await rateLimit(req.ip);
