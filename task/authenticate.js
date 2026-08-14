@@ -10,11 +10,9 @@ const authenticate = async (sessionId) => {
         const response = await fetch(`${process.env.AUTH_SERVICE_URL}/validate`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                sessionId: sessionId
-            })
+                "Content-Type": "application/json",
+                "Authorization": sessionId
+            }
         });
 
         if (!response.ok) {
