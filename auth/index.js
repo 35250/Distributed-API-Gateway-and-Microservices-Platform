@@ -98,7 +98,7 @@ app.post("/login", async (req, res) => {
 
 app.delete("/logout", async (req, res) => {
     try{
-        const {sessionId} = req.body;
+        const sessionId = req.headers.authorization;
 
         if(typeof sessionId !== "string" || sessionId.trim().length === 0){
             return res.status(400).send("Invalid session");
@@ -129,7 +129,7 @@ app.delete("/logout", async (req, res) => {
 
 app.post("/validate", async (req, res) => {
     try{
-        const {sessionId} = req.body;
+        const sessionId = req.headers.authorization;
 
         if(typeof sessionId !== "string" || sessionId.trim().length === 0){
             return res.status(400).send("Please provide a valid session id");
